@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
 const https = require('https');
+const path = require('path');
 const { spawn } = require('child_process');
 
 const versionUrl = 'https://discord.com/api/download?platform=linux&format=tar.gz';
@@ -10,6 +11,7 @@ run().catch(error =>
 {
 	console.log(error);
 	process.stdin.on('data', () => process.exit());
+	process.stdin.resume();
 });
 
 
@@ -29,6 +31,9 @@ async function run()
 	{
 		console.log(`Downloading new version from ${currentClient.url}`);
 		await downloadClient(currentClient.url, directory);
+		
+		config.version = currentClient.version;
+		await saveConfig(config, directory);
 	}
 	else
 	{
@@ -36,7 +41,7 @@ async function run()
 	}
 	
 	console.log(`Running Discord ${currentClient.version} now. Enjoy!`);
-	launchClient();
+	launchClient(directory);
 }
 
 
@@ -61,6 +66,13 @@ async function getConfig(directory)
 	{
 		return { version: '' };
 	}
+}
+
+
+//Saves the config for the currently installed version.
+async function saveConfig(config, directory)
+{
+	await fs.writeFile(path.join(directory, configFilename), JSON.stringify(config));
 }
 
 
@@ -108,9 +120,9 @@ function downloadClient(url, directory)
 		{
 			if(response.statusCode === 200)
 			{
-				let tar = spawn('tar', ['xvf', '-'], { cwd: directory });
+				let tar = spawn('tar', ['zxf', '-'], { cwd: directory });
 				
-				response.pipe(tar.stdin);
+				tar.on('spawn', () => response.pipe(tar.stdin));
 				tar.on('exit', exitCode => exitCode === 0 ? resolve() : reject(`tar returned exit code ${exitCode}`));
 			}
 			else
@@ -126,6 +138,6 @@ function downloadClient(url, directory)
 //launcher script running: https://nodejs.org/api/child_process.html#optionsdetached
 function launchClient(directory)
 {
-	let client = spawn(path.join(directory, 'Discord', 'discord'), { detached: true, stdio: 'ignore' });
+	let client = spawn(path.join(directory, 'Discord', 'Discord'), { detached: true, stdio: 'ignore' });
 	client.unref();
 }
