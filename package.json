@@ -1,0 +1,25 @@
+{
+  "name": "linux-discord-launcher",
+  "version": "1.0.0",
+  "description": "Launcher and updater script for the Discord client on Linux.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justincardoza/linux-discord-launcher.git"
+  },
+  "keywords": [
+    "discord",
+    "linux",
+    "launcher",
+    "updater"
+  ],
+  "author": "Justin Cardoza",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/justincardoza/linux-discord-launcher/issues"
+  },
+  "homepage": "https://github.com/justincardoza/linux-discord-launcher#readme"
+}
