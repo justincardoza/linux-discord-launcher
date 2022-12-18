@@ -6,9 +6,14 @@ const versionUrl = 'https://discord.com/api/download?platform=linux&format=tar.g
 const configFilename = 'discord.json';
 
 
-run();
+run().catch(error =>
+{
+	console.log(error);
+	process.stdin.on('data', () => process.exit());
+});
 
 
+//Gathers information, downloads the latest client if needed, and then runs the installed version.
 async function run()
 {
 	let directory = getInstallDirectory();
@@ -30,7 +35,8 @@ async function run()
 		console.log('Up to date!');
 	}
 	
-	
+	console.log(`Running Discord ${currentClient.version} now. Enjoy!`);
+	launchClient();
 }
 
 
@@ -113,4 +119,13 @@ function downloadClient(url, directory)
 			}
 		});
 	});
+}
+
+
+//Runs the Discord client. For reference on how to launch an independent process that won't keep the 
+//launcher script running: https://nodejs.org/api/child_process.html#optionsdetached
+function launchClient(directory)
+{
+	let client = spawn(path.join(directory, 'Discord', 'discord'), { detached: true, stdio: 'ignore' });
+	client.unref();
 }
