@@ -1,6 +1,7 @@
 const fs = require('fs/promises');
 const https = require('https');
 const path = require('path');
+const os = require('os');
 const { spawn } = require('child_process');
 
 const versionUrl = 'https://discord.com/api/download?platform=linux&format=tar.gz';
@@ -34,6 +35,8 @@ async function run()
 		
 		config.version = currentClient.version;
 		await saveConfig(config, directory);
+		
+		await writeMenuEntry(directory);
 	}
 	else
 	{
@@ -131,6 +134,36 @@ function downloadClient(url, directory)
 			}
 		});
 	});
+}
+
+
+//Takes the default discord.desktop shortcut file from the installation and modifies it to run this script,
+//storing the modified file in ~/.local/share/applications for use in standard application menus.
+async function writeMenuEntry(directory)
+{
+	let content = await fs.readFile(path.join(directory, 'Discord', 'discord.desktop'), { encoding: 'utf-8' });
+	let lines = content.split(/[\r\n]+/);
+	
+	let overrides = 
+	{
+		'Exec': `node ${__filename} ${directory}`,
+		'Icon': path.join(directory, 'Discord', 'discord.png'),
+		'Path': path.join(directory, 'Discord'),
+	};
+	
+	for(let i = 0; i < lines.length; i++)
+	{
+		let parts = lines[i].split('=', 2);
+		
+		if(parts?.length === 2 && parts[0] in overrides)
+		{
+			lines[i] = parts[0] + '=' + overrides[parts[0]];
+		}
+	}
+	
+	lines.push('Terminal=true');
+	
+	await fs.writeFile(path.join(os.homedir(), '.local', 'share', 'applications', 'discord.desktop'), lines.join('\n'));
 }
 
 
