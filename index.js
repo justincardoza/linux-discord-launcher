@@ -1,5 +1,6 @@
 const fs = require('fs/promises');
 const https = require('https');
+const { spawn } = require('child_process');
 
 const versionUrl = 'https://discord.com/api/download?platform=linux&format=tar.gz';
 const configFilename = 'discord.json';
@@ -18,6 +19,18 @@ async function run()
 	
 	let currentClient = await getCurrentVersion(versionUrl);
 	console.log(`Latest client is version ${currentClient.version}`);
+	
+	if(config.version !== currentClient.version)
+	{
+		console.log(`Downloading new version from ${currentClient.url}`);
+		await downloadClient(currentClient.url, directory);
+	}
+	else
+	{
+		console.log('Up to date!');
+	}
+	
+	
 }
 
 
@@ -73,5 +86,31 @@ function getCurrentVersion(url)
 				reject(`Expected a 3XX redirect status code, got ${response.statusCode} instead.`);
 			}
 		})
+	});
+}
+
+
+//Downloads and extracts the latest client into the specified directory, using a pipe in-memory to avoid 
+//unnecessary writes to storage (this could just download the .tar.gz to the filesystem and then extract 
+//it separately, but doing it this way skips those write operates so only the extracted files need to be 
+//written).
+function downloadClient(url, directory)
+{
+	return new Promise((resolve, reject) =>
+	{
+		https.get(url, response =>
+		{
+			if(response.statusCode === 200)
+			{
+				let tar = spawn('tar', ['xvf', '-'], { cwd: directory });
+				
+				response.pipe(tar.stdin);
+				tar.on('exit', exitCode => exitCode === 0 ? resolve() : reject(`tar returned exit code ${exitCode}`));
+			}
+			else
+			{
+				reject(`Got HTTP status code ${response.statusCode} while trying to download client.`);
+			}
+		});
 	});
 }
