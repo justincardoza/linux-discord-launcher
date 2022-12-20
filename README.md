@@ -8,15 +8,19 @@ packages for other package managers, but it's hit-or-miss whether those are actu
 
 Clone this repository or just download `index.js` to wherever you want to keep the launcher script. This could be where you want to install Discord, or it can 
 be a separate location if you prefer. You will also need to install [Node.js](https://nodejs.org/) using your preferred method, whether that's a direct download 
-or a [package manager](https://nodejs.org/en/download/package-manager/), which Node supports quite a few of.
+or a [package manager](https://nodejs.org/en/download/package-manager/), which Node supports quite a few of. On [Fedora](https://getfedora.org), the command I 
+used was `sudo dnf install nodejs`.
 
 ## How to use
 
-Run the main script using `node`. It will download the client, extract it into the directory you choose, and run it. You can specify a directory on the command 
-line as the first argument to the script, and it will install Discord into that directory. Otherwise, if you don't specify an install directory, it will default 
-to the current working directory, i.e. the one you ran the script from. This is how to specify an install directory:
+Run the main script using `node`. It will download the client, extract it into the directory you choose, and run the main executable. You can specify a directory 
+on the command line as the first argument to the script, and it will install Discord into that directory. Otherwise, if you don't specify an install directory, 
+it will default to the current working directory, i.e. the one you ran the script from. This is how to specify an install directory:
 
 `node path/to/launcher/script/index.js path/to/discord/directory`
+
+After the first run, it will install a desktop entry in `~/.local/share/applications` for easy access under most Linux application menus. It uses the original 
+`discord.desktop` file included in the Discord bundle, modified to run the launcher script in the directory used for the first run.
 
 ## Disclaimer
 
