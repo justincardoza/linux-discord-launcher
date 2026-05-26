@@ -1,5 +1,7 @@
 # Unofficial Discord Launcher for Linux
 
+**Deprecated**: since I first published this, Discord has added more options for Linux installations including an RPM package and an official Flatpak. I recommend going one of those routes now rather than trying to use this script, especially since it might need some modifications to work with more recent versions. Thanks for adding more Linux options, Discord!
+
 This is a small script to keep a Discord client installation up to date on a Linux system. If you use a package manager other than `apt`, the official client 
 is currently only distributed as a tarball. This script adds a step before running the client to check for and download the newest version. There are unofficial 
 packages for other package managers, but it's hit-or-miss whether those are actually up to date. Going directly to the source eliminates that worry.
